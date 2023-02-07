@@ -8,6 +8,8 @@ import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.springframework.stereotype.Service;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
 
 @Service
@@ -15,6 +17,7 @@ import java.io.File;
 @Slf4j
 public class TestService {
     private ChromeDriverService chromeDriverService;
+    private CropImageService cropImageService;
 
     public String test() {
         chromeDriverService.setupChromeDriver();
@@ -38,6 +41,11 @@ public class TestService {
             File destFile = new File(fileWithPath);
             //Copy file at destination
             FileUtils.copyFile(srcFile, destFile);
+            File imageFile = new File(fileWithPath);
+            BufferedImage bufferedImage = ImageIO.read(srcFile);
+            BufferedImage subImg = cropImageService.cropImage(bufferedImage, 1230, 344, 180, 40);
+            File pathFile = new File("D:\\test_img\\test_1.png");
+            ImageIO.write(subImg, "png", pathFile);
         } catch (Exception ex) {
             log.debug("error: " + ex.getMessage());
         }
