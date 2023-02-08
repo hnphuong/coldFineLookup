@@ -14,7 +14,9 @@ public class TestController {
 
     @GetMapping(value = "/test")
     public String test() {
-        String rs = testService.test();
+        //String rs = testService.test();
+        String rs = "test";
+        testService.parseData("abc");
         return "result: " + rs;
     }
 }
