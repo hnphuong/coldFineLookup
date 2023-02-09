@@ -18,7 +18,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -70,8 +70,32 @@ public class TestService {
         String html = Constants.HTML5.replace("###", Constants.DATA);
         Document doc = Jsoup.parse(html);
         Elements hrs = doc.body().getElementsByTag("hr");
-        System.out.println(hrs.size());
+        System.out.println("size: " + hrs.size());
+        Elements details = doc.select("div.form-group");
+        Map<Integer, List<String>> parse = new HashMap<>();
+        int count = 0;
+        int countElement = 0;
+        List<String> separates = new ArrayList<>();
+        for (Element element : details) {
+            count++;
+            separates.add(element.html());
+            if (count % 12 == 0) {
+                parse.put(countElement, separates);
+                countElement++;
+                separates = new ArrayList<>();
+                log.debug("element: " + element.html());
+            }
+        }
+        log.debug("parse: " + parse.size());
         log.debug("data: " + doc.title());
+    }
+
+    private String parseElement(Element element) {
+        if (element.select("div.row").size() > 0) {
+            return "";
+        } else {
+            return element.html();
+        }
     }
 
     private String readImage(File fileImage) {

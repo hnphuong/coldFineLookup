@@ -1,0 +1,15 @@
+logging:
+  level:
+    hnp.selenium.chromedriver: debug
+    org.springframework.aop.interceptor: trace
+    org.springframework.web.filter.CommonsRequestLoggingFilter: debug
+
+spring:
+  application:
+    name: chromedriver
+    version: 0.0.1
+  messages:
+    basename: i18n/messages
+
+server:
+  port: 8080
