@@ -11,6 +11,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.openqa.selenium.*;
+import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +20,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.*;
 
 @Service
@@ -28,49 +31,70 @@ public class TestService {
     private CropImageService cropImageService;
 
     public String test() {
-        chromeDriverService.setupChromeDriver();
-        WebDriver driver = chromeDriverService.getDriver();
-        String baseUrl = "https://www.csgt.vn/tra-cuu-phuong-tien-vi-pham.html";
-        driver.get(baseUrl);
-        // get the actual value of the title
-        String captcha;
-        String nameImage = UUID.randomUUID().toString();
-        File fileCaptcha = this.takeSnapShot(driver, Constants.RESOURCE_ORIGIN.replace("###", nameImage), nameImage);
-        //chromeDriverService.close();
-        if (fileCaptcha != null) {
-            captcha = this.readImage(fileCaptcha);
-        } else {
-            return null;
-        }
-        WebElement licensePlates = driver.findElement(By.name("BienKiemSoat"));
-        licensePlates.sendKeys("30E48786");
-        WebElement txtCaptcha = driver.findElement(By.name("txt_captcha"));
-        assert captcha != null;
-        txtCaptcha.sendKeys(this.removeSpecialCharacters(captcha.toLowerCase()));
-        WebElement search = driver.findElement(By.className("btnTraCuu"));
-        search.click();
-        WebElement resultCaptcha = driver.findElement(By.className("xe_texterror"));
-        if (resultCaptcha.getText().equals(Constants.CAPTCHA_NOT_MATCH)) return Constants.CAPTCHA_NOT_MATCH;
-        WebElement resultSearch = driver.findElement(By.id("bodyPrint123"));
-        String data = resultSearch.getAttribute("innerHTML");
-        if (data.isBlank()) {
-            try {
-                Thread.sleep(15000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
+        String data = this.getResultSearch();
+        int i = 1;
+        do {
+            assert data != null;
+            if (!data.equals(Constants.CAPTCHA_NOT_MATCH)) break;
+            chromeDriverService.close();
+            data = this.getResultSearch();
+            System.out.println(i);
+            i++;
+        } while (i <= 3);
         if (!data.isBlank()) {
             log.debug(data);
+            this.parseData(data);
         }
-        return captcha;
+        return data;
+    }
+
+    private String getResultSearch() {
+        try {
+            chromeDriverService.setupChromeDriver();
+            WebDriver driver = chromeDriverService.getDriver();
+            String baseUrl = "https://www.csgt.vn/tra-cuu-phuong-tien-vi-pham.html";
+            driver.get(baseUrl);
+            String captcha;
+            String nameImage = UUID.randomUUID().toString();
+            File fileCaptcha = this.takeSnapShot(driver, Constants.RESOURCE_ORIGIN.replace("###", nameImage), nameImage);
+            //chromeDriverService.close();
+            if (fileCaptcha != null) {
+                captcha = this.readImage(fileCaptcha);
+            } else {
+                return null;
+            }
+            WebElement licensePlates = driver.findElement(By.name("BienKiemSoat"));
+            licensePlates.sendKeys("30E48786");
+            Select drpTypeVehicle = new Select(driver.findElement(By.name("LoaiXe")));
+            drpTypeVehicle.selectByValue("1");
+            WebElement txtCaptcha = driver.findElement(By.name("txt_captcha"));
+            assert captcha != null;
+            txtCaptcha.sendKeys(this.removeSpecialCharacters(captcha.replace("Z", "7").replace("H", "5").toLowerCase()));
+            WebElement search = driver.findElement(By.className("btnTraCuu"));
+            search.click();
+            //WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+            //wait.until(webDriver -> !webDriver.findElement(By.className("xe_texterror")).getText().isBlank());
+            Thread.sleep(3000);
+            WebElement resultCaptcha = driver.findElement(By.className("xe_texterror"));
+            if (resultCaptcha.getText().equals(Constants.CAPTCHA_NOT_MATCH)) return Constants.CAPTCHA_NOT_MATCH;
+            WebElement resultSearch = driver.findElement(By.id("bodyPrint123"));
+            String data = resultSearch.getAttribute("innerHTML");
+            if (data.isBlank() || data.contains("Không tìm thấy kết quả !")) {
+                WebDriverWait waitResult = new WebDriverWait(driver, Duration.ofSeconds(7));
+                waitResult.until(webDriver -> !webDriver.findElement(By.id("bodyPrint123")).getAttribute("innerHTML").contains("Không tìm thấy kết quả !"));
+            }
+            return data;
+        } catch (Exception ex) {
+            log.debug("error: " + ex.getMessage());
+            return "";
+        }
     }
 
     public void parseData(String dataHtml) {
-        String html = Constants.HTML5.replace("###", Constants.DATA);
+        String html = Constants.HTML5.replace("###", dataHtml);
         Document doc = Jsoup.parse(html);
-        Elements hrs = doc.body().getElementsByTag("hr");
-        System.out.println("size: " + hrs.size());
+        //Elements hrs = doc.body().getElementsByTag("hr");
+        //System.out.println("size: " + hrs.size());
         Elements details = doc.select("div.form-group");
         Map<Integer, List<String>> parse = new HashMap<>();
         int count = 0;
@@ -78,7 +102,7 @@ public class TestService {
         List<String> separates = new ArrayList<>();
         for (Element element : details) {
             count++;
-            separates.add(element.html());
+            separates.add(this.parseElement(element));
             if (count % 12 == 0) {
                 parse.put(countElement, separates);
                 countElement++;
@@ -87,12 +111,18 @@ public class TestService {
             }
         }
         log.debug("parse: " + parse.size());
-        log.debug("data: " + doc.title());
     }
 
     private String parseElement(Element element) {
-        if (element.select("div.row").size() > 0) {
-            return "";
+        if (!element.select("div.row").isEmpty()) {
+            String key = element.select("div.row > label.col-md-3 > span").html();
+            String value;
+            if (element.select("div.row > div.col-md-9 > span").isEmpty()) {
+                value = element.select("div.row > div.col-md-9").html();
+            } else {
+                value = element.select("div.row > div.col-md-9 > span").html();
+            }
+            return key + " # " + value;
         } else {
             return element.html();
         }
