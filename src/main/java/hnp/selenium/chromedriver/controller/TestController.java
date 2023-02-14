@@ -1,5 +1,6 @@
 package hnp.selenium.chromedriver.controller;
 
+import hnp.selenium.chromedriver.constant.Constants;
 import hnp.selenium.chromedriver.constant.enums.ApiResponseCode;
 import hnp.selenium.chromedriver.dto.BodyResponseDTO;
 import hnp.selenium.chromedriver.dto.RestResponseWrapper;
@@ -19,9 +20,9 @@ public class TestController {
     private TestService testService;
     private MessageUtils messageUtils;
 
-    @GetMapping(value = "/test")
-    public String test() {
-        String rs = testService.test();
+    @PostMapping(value = "/test")
+    public String test(@Validated @RequestBody ColdPenaltyReq req) {
+        String rs = testService.test(req);
         //String rs = "test";
         //testService.parseData("abc");
         return "result: " + rs;
@@ -31,6 +32,7 @@ public class TestController {
     public ResponseEntity<BodyResponseDTO<ColdPenaltyRes>> testData(@Validated @RequestBody ColdPenaltyReq req) {
         String i18nMessage = messageUtils.populate(ApiResponseCode.SUCCESS.getMessage());
         ColdPenaltyRes dataRes = new ColdPenaltyRes();
+        testService.parseData(Constants.DATA);
         dataRes.setData1("data response");
         return RestResponseWrapper.getResponse(ApiResponseCode.SUCCESS, i18nMessage, dataRes);
     }

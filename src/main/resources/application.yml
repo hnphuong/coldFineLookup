@@ -8,6 +8,13 @@ spring:
   application:
     name: chromedriver
     version: 0.0.1
+  data:
+    mongodb:
+      host: ${DB_HOST_MG:localhost}
+      port: ${DB_PORT_MG:27017}
+      database: ${DB_NAME_MG:coldPenalty}
+      repositories:
+        enabled: true
   messages:
     basename: i18n/messages
 

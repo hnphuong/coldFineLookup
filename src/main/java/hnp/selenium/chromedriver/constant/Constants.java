@@ -14,6 +14,18 @@ public class Constants {
     public static final String RESOURCE_ORIGIN_CUT = "D:\\test_img\\###_cut.png";
     public static final String SEARCH_NOT_FOUND = "Không tìm thấy kết quả !";
     public static final String CAPTCHA_NOT_MATCH = "Mã xác nhận sai!";
+    public static final String URL_BASE = "https://www.csgt.vn/tra-cuu-phuong-tien-vi-pham.html";
+
+    public static final String LICENSE_PLATES = "Biển kiểm soát";
+    public static final String LICENSE_PLATES_COLOR = "Màu biển";
+    public static final String TYPE_VEHICLE = "Loại phương tiện";
+    public static final String VIOLATION_TIME = "Thời gian vi phạm";
+    public static final String VIOLATION_LOCATION = "Địa điểm vi phạm";
+    public static final String VIOLATION = "Hành vi vi phạm";
+    public static final String STATUS = "Trạng thái";
+    public static final String VIOLATION_DETECTION_UNIT = "Đơn vị phát hiện vi phạm";
+    public static final String PLACE_TO_SOLVE = "Nơi giải quyết vụ việc";
+
     public static final String HTML5 = "<html><head><title>First parse</title></head>"
             + "<body>###</body></html>";
     public static final String DATA = "<div class=\"form-group\">\n" +
