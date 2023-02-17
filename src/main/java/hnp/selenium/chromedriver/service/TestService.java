@@ -19,7 +19,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.Select;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +26,6 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.time.Duration;
 import java.util.*;
 
 @Service
@@ -46,13 +44,22 @@ public class TestService {
             if (!data.equals(Constants.CAPTCHA_NOT_MATCH)) break;
             chromeDriverService.close();
             data = this.getResultSearch(req);
-            System.out.println(i);
             i++;
         } while (i <= 3);
-        if (!data.isBlank()) {
+        assert data != null;
+        if (!data.isBlank() && !data.equals(Constants.SEARCH_NOT_FOUND) && !data.equals(Constants.CAPTCHA_NOT_MATCH)) {
             log.debug(data);
-            this.parseData(data);
+            this.parseData(data, req);
+        }else{
+            String uniqueKey = req.getLicensePlates() + "#" + req.getTypeVehicle().toString();
+            Optional<SanctionInformation> isSanctionInformation = sanctionInformationRepository.findByUniqueKey(uniqueKey);
+            if(isSanctionInformation.isPresent()){
+                data = isSanctionInformation.get().getResourceOriginal();
+            }else {
+                data = "";
+            }
         }
+        chromeDriverService.close();
         return data;
     }
 
@@ -64,7 +71,6 @@ public class TestService {
             String captcha;
             String nameImage = UUID.randomUUID().toString();
             File fileCaptcha = this.takeSnapShot(driver, Constants.RESOURCE_ORIGIN.replace("###", nameImage), nameImage);
-            //chromeDriverService.close();
             if (fileCaptcha != null) {
                 captcha = this.readImage(fileCaptcha);
             } else {
@@ -81,56 +87,63 @@ public class TestService {
             search.click();
             //WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
             //wait.until(webDriver -> !webDriver.findElement(By.className("xe_texterror")).getText().isBlank());
-            Thread.sleep(3000);
+            Thread.sleep(4000);
             WebElement resultCaptcha = driver.findElement(By.className("xe_texterror"));
             if (resultCaptcha.getText().equals(Constants.CAPTCHA_NOT_MATCH)) return Constants.CAPTCHA_NOT_MATCH;
             WebElement resultSearch = driver.findElement(By.id("bodyPrint123"));
-            String data = resultSearch.getAttribute("innerHTML");
-            if (data.isBlank() || data.contains("Không tìm thấy kết quả !")) {
-                WebDriverWait waitResult = new WebDriverWait(driver, Duration.ofSeconds(7));
-                waitResult.until(webDriver -> !webDriver.findElement(By.id("bodyPrint123")).getAttribute("innerHTML").contains("Không tìm thấy kết quả !"));
-            }
-            return data;
-        } catch (Exception ex) {
+            return resultSearch.getAttribute("innerHTML");
+        } catch (InterruptedException ex) {
             log.debug("error: " + ex.getMessage());
-            return "";
+            return Constants.SEARCH_NOT_FOUND;
         }
     }
 
-    public void parseData(String dataHtml) {
-        String html = Constants.HTML5.replace("###", dataHtml);
-        Document doc = Jsoup.parse(html);
-        Elements details = doc.select("div.form-group");
+    public void parseData(String dataHtml, ColdPenaltyReq req) {
+        String[] data = dataHtml.split("<hr style=\"margin-bottom: 25px;\">");
         Map<Integer, List<String>> parse = new HashMap<>();
-        int count = 0;
-        int countElement = 0;
-        List<String> separates = new ArrayList<>();
-        for (Element element : details) {
-            count++;
-            separates.add(this.parseElement(element));
-            if (count % 12 == 0) {
-                parse.put(countElement, separates);
-                countElement++;
-                separates = new ArrayList<>();
-                log.debug("element: " + element.html());
-            }
+        for (int i = 0; i < data.length; i++) {
+            parse.put(i, this.analysisHtml(data[i]));
         }
-        this.createSanctionInformation(parse, Constants.DATA);
+        this.createSanctionInformation(parse, dataHtml, req.getLicensePlates(), req.getTypeVehicle().toString());
         log.debug("parse: " + parse.size());
     }
 
-    private void createSanctionInformation(Map<Integer, List<String>> parse, String resourceOriginal) {
-        SanctionInformation sanctionInformation = new SanctionInformation();
-        sanctionInformation.setUniqueKey("30E48786#1");
-        sanctionInformation.setLicensePlates("30E48786");
-        sanctionInformation.setTypeVehicle("1");
-        sanctionInformation.setResourceOriginal(resourceOriginal);
-        List<SanctionDetail> sanctionDetails = new ArrayList<>();
-        for (Map.Entry<Integer, List<String>> sanctionDetail : parse.entrySet()) {
-            sanctionDetails.add(this.sanctionDetail(sanctionDetail.getValue()));
+    private List<String> analysisHtml(String html) {
+        Document doc = Jsoup.parse(html);
+        Elements details = doc.select("div.form-group");
+        List<String> separates = new ArrayList<>();
+        for (Element element : details) {
+            separates.add(this.parseElement(element));
         }
-        sanctionInformation.setSanctionDetails(sanctionDetails);
-        sanctionInformationRepository.save(sanctionInformation);
+        return separates;
+    }
+
+    private void createSanctionInformation(Map<Integer, List<String>> parse, String resourceOriginal, String licensePlates, String typeVehicle) {
+        String uniqueKey = licensePlates + "#" + typeVehicle;
+        Optional<SanctionInformation> isSanctionInformation = sanctionInformationRepository.findByUniqueKey(uniqueKey);
+        if (isSanctionInformation.isPresent()) {
+            List<SanctionDetail> sanctionDetails = new ArrayList<>();
+            for (Map.Entry<Integer, List<String>> data : parse.entrySet()) {
+                SanctionDetail sanctionDetail = this.sanctionDetail(data.getValue());
+                if (sanctionDetail != null) {
+                    sanctionDetails.add(sanctionDetail);
+                }
+            }
+            isSanctionInformation.get().setSanctionDetails(sanctionDetails);
+            sanctionInformationRepository.save(isSanctionInformation.get());
+        } else {
+            SanctionInformation sanctionInformation = new SanctionInformation();
+            sanctionInformation.setUniqueKey(uniqueKey);
+            sanctionInformation.setLicensePlates(licensePlates);
+            sanctionInformation.setTypeVehicle(typeVehicle);
+            sanctionInformation.setResourceOriginal(resourceOriginal);
+            List<SanctionDetail> sanctionDetails = new ArrayList<>();
+            for (Map.Entry<Integer, List<String>> sanctionDetail : parse.entrySet()) {
+                sanctionDetails.add(this.sanctionDetail(sanctionDetail.getValue()));
+            }
+            sanctionInformation.setSanctionDetails(sanctionDetails);
+            sanctionInformationRepository.save(sanctionInformation);
+        }
     }
 
     private String parseElement(Element element) {
@@ -144,47 +157,38 @@ public class TestService {
             }
             return key + "#" + value;
         } else {
-            System.out.println("#div.row: " + element.html());
             return element.html();
         }
     }
 
-    private SanctionDetail sanctionDetail(List<String> detail) {
-        SanctionDetail sanctionDetail = new SanctionDetail();
-        PlaceToSolve placeToSolve = new PlaceToSolve();
-        for (String s : detail) {
-            if (s.contains(Constants.LICENSE_PLATES)) {
-                sanctionDetail.setLicensePlates(s.split("#")[1]);
-            }
-            if (s.contains(Constants.LICENSE_PLATES_COLOR)) {
-                sanctionDetail.setLicensePlateColor(s.split("#")[1]);
-            }
-            if (s.contains(Constants.TYPE_VEHICLE)) {
-                sanctionDetail.setTypeVehicle(s.split("#")[1]);
-            }
-            if (s.contains(Constants.VIOLATION_TIME)) {
-                String time = s.split("#")[1];
-                sanctionDetail.setViolationTime(time);
-                sanctionDetail.setUniqueKey(DateUtil.stringToLong(time).toString());
-            }
-            if (s.contains(Constants.VIOLATION_LOCATION)) {
-                sanctionDetail.setViolationLocation(s.split("#")[1]);
-            }
-            if (s.contains(Constants.VIOLATION)) {
-                sanctionDetail.setViolation(s.split("#")[1]);
-            }
-            if (s.contains(Constants.STATUS)) {
-                sanctionDetail.setStatus(s.split("#")[1]);
-            }
-            if (s.contains(Constants.VIOLATION_DETECTION_UNIT)) {
-                sanctionDetail.setViolationDetectionUnit(s.split("#")[1]);
-            }
-            placeToSolve.setName(detail.get(9));
-            placeToSolve.setAddress(detail.get(10));
-            placeToSolve.setPhone(detail.get(11));
+    private SanctionDetail sanctionDetail(List<String> details) {
+        if (!details.isEmpty() && details.size() > 8) {
+            SanctionDetail sanctionDetail = new SanctionDetail();
+            PlaceToSolve placeToSolve = new PlaceToSolve();
+            sanctionDetail.setLicensePlates(this.analysisData(details, Constants.LICENSE_PLATES));
+            sanctionDetail.setLicensePlateColor(this.analysisData(details, Constants.LICENSE_PLATES_COLOR));
+            sanctionDetail.setTypeVehicle(this.analysisData(details, Constants.TYPE_VEHICLE));
+            String time = this.analysisData(details, Constants.VIOLATION_TIME);
+            sanctionDetail.setViolationTime(time);
+            sanctionDetail.setUniqueKey(DateUtil.stringToLong(time).toString());
+            sanctionDetail.setViolationLocation(this.analysisData(details, Constants.VIOLATION_LOCATION));
+            sanctionDetail.setViolation(this.analysisData(details, Constants.VIOLATION));
+            sanctionDetail.setStatus(this.analysisData(details, Constants.STATUS));
+            sanctionDetail.setViolationDetectionUnit(this.analysisData(details, Constants.VIOLATION_DETECTION_UNIT));
+            placeToSolve.setName(details.get(details.size() - 3));
+            placeToSolve.setAddress(details.get(details.size() - 2));
+            placeToSolve.setPhone(details.get(details.size() - 1));
+            sanctionDetail.setPlaceToSolve(placeToSolve);
+            return sanctionDetail;
         }
-        sanctionDetail.setPlaceToSolve(placeToSolve);
-        return sanctionDetail;
+        return null;
+    }
+
+    private String analysisData(List<String> details, String content) {
+        for (String detail : details) {
+            if (detail.contains(content)) return detail.split("#")[1];
+        }
+        return "";
     }
 
     private String readImage(File fileImage) {

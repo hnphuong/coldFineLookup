@@ -23,7 +23,7 @@ public class DateUtil {
         try {
             return dateFormatter.parse(dateString).getTime();
         } catch (Exception ex) {
-            return null;
+            return 0L;
         }
     }
 }
