@@ -4,6 +4,12 @@ logging:
     org.springframework.aop.interceptor: trace
     org.springframework.web.filter.CommonsRequestLoggingFilter: debug
 
+server:
+  port: ${PORT:8080}
+
+messages:
+  home: Hello, Memorynotfound!
+
 spring:
   application:
     name: chromedriver
@@ -18,5 +24,16 @@ spring:
   messages:
     basename: i18n/messages
 
-server:
-  port: 8080
+  thymeleaf:
+    cache: false
+    check-template: true
+    check-template-location: true
+    content-type: text/html
+    enabled: true
+    encoding: UTF-8
+    # excluded-view-names:
+    # mode: HTML5
+    # prefix: /templates/
+    # suffix: .html
+    # template-resolver-order:
+    # view-names:

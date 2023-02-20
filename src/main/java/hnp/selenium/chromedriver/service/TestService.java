@@ -108,6 +108,17 @@ public class TestService {
         log.debug("parse: " + parse.size());
     }
 
+    public Map<Integer, List<String>> resultData(String dataHtml, String licensePlates, String typeVehicle) {
+        String[] data = dataHtml.split("<hr style=\"margin-bottom: 25px;\">");
+        Map<Integer, List<String>> parse = new HashMap<>();
+        for (int i = 0; i < data.length; i++) {
+            parse.put(i, this.analysisHtml(data[i]));
+        }
+        this.createSanctionInformation(parse, dataHtml, licensePlates, typeVehicle);
+        log.debug("parse: " + parse.size());
+        return parse;
+    }
+
     private List<String> analysisHtml(String html) {
         Document doc = Jsoup.parse(html);
         Elements details = doc.select("div.form-group");
