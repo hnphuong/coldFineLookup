@@ -21,6 +21,7 @@ spring:
       database: ${DB_NAME_MG:coldPenalty}
       repositories:
         enabled: true
+      
   messages:
     basename: i18n/messages
 

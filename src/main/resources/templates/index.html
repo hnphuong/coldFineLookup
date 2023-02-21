@@ -7,15 +7,16 @@
     <meta name="description" content="content"/>
     <meta name="author" content="author"/>
     <meta name="generator" content="generator"/>
-    <title>Bootstrap demo</title>
+    <title>Tra cứu phạt nguội</title>
     <link rel="stylesheet" th:href="@{/css/bootstrap.css}" type="text/css"/>
+    <link rel="stylesheet" th:href="@{/css/font-awesome.css}" type="text/css"/>
     <link rel="stylesheet" th:href="@{/css/main.css}" type="text/css"/>
 </head>
 
 <body class="bg-light">
 <div class="container bg-light-subtle">
     <main>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark" aria-label="Offcanvas navbar large">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-success text-white" aria-label="navbar large">
             <div class="container-fluid">
                 <a class="navbar-brand" href="#">Trang chủ</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas"
@@ -32,7 +33,7 @@
                     <div class="offcanvas-body">
                         <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
                             <li class="nav-item">
-                                <a class="nav-link active" aria-current="page" href="index.html">Thông tin</a>
+                                <a class="nav-link active" aria-current="page" href="/">Thông tin</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="#">Link</a>
@@ -57,9 +58,8 @@
             </div>
         </nav>
         <!-- end menu -->
-        <div class="py-5 text-center">
-            <img class="d-block mx-auto mb-4" th:src="@{/assets/brand/bootstrap-logo.svg}" alt="" width="72"
-                 height="57">
+        <div class="py-3 text-center">
+            <img class="d-block mx-auto mb-4" th:src="@{/assets/logo/main.png}" alt="logo"/>
             <h2>Checkout form</h2>
             <p class="lead">Below is an example form built entirely with Bootstrap’s form controls.</p>
         </div>
@@ -93,15 +93,23 @@
             </form>
         </div>
         <hr class="my-4">
-        <div class="row g-5">
-            <div class="col-md-12" th:each="map : ${#maps.size(message)}">
-                <ul class="list-group">
-                    <li class="list-group-item" th:each="color : ${map.get(1)}" th:utext="${color}"></li>
-                </ul>
-<!--                <p th:utext="${#maps.size(message)}"></p>-->
-<!--                <ul class="list-group" th:each="map : ${#maps.size(message)}">-->
-<!--                    <li class="list-group-item" th:each="color : ${colors}" th:utext="${color}"></li>-->
-<!--                </ul>-->
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-6 pb-3" th:each="mapItem, state : ${map}">
+                    <div class="card shadow-lg bg-body rounded">
+                        <div class="card-body">
+                            <div class="card-header">
+                                <h5 class="text-danger"><i class="fa fa-frown-o" aria-hidden="true"></i> Lần: <span
+                                        th:utext="${state.count}"></span></h5>
+                            </div>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item" th:each="data : ${mapItem.value}"
+                                    th:utext="${data}"><span><i
+                                        class="fa fa-check" aria-hidden="true"></i></span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </main>
