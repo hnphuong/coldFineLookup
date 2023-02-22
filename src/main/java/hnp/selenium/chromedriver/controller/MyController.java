@@ -1,19 +1,23 @@
 package hnp.selenium.chromedriver.controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.util.Date;
 
 @Controller
+@Slf4j
 public class MyController {
-    private final Logger logger = LoggerFactory.getLogger(MyController.class);
-
-    @GetMapping("/login")
+    @GetMapping("/")
     public String index() {
-        logger.debug("login");
+        log.debug("login");
         return "login";
+    }
+
+    @GetMapping("/s")
+    public String search() {
+        log.debug("search: " + new Date());
+        return "search";
     }
 }

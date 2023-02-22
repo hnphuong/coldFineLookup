@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta name="description" content="content"/>
+    <meta name="author" content="author"/>
+    <meta name="generator" content="generator"/>
+    <title>Test</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.css}" type="text/css"/>
+    <link rel="stylesheet" th:href="@{/css/font-awesome.css}" type="text/css"/>
+    <link rel="stylesheet" th:href="@{/css/main.css}" type="text/css"/>
+</head>
+<body class="bg-light">
+<div class="container">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Navbar</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Link</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            Dropdown
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="#">Action</a></li>
+                            <li><a class="dropdown-item" href="#">Another action</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="#">Something else here</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+                    </li>
+                </ul>
+                <form class="d-flex">
+                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                    <button class="btn btn-outline-success" type="submit">Search</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+    <hr class="my-4">
+    <div class="container">
+        <div class="row" id="feedback1">
+
+        </div>
+    </div>
+    <h1 class="text-center">Search Function</h1>
+    <div class="row">
+        <div class="col-12">
+            <form action="#" id="search-cold-penalty">
+                <div class="col-auto">
+                    <label for="license-plates" class="visually-hidden">License Plates</label>
+                    <input type="text" class="form-control" id="license-plates" placeholder="License Plates"/>
+                </div>
+                <div class="col-auto">
+                    <label for="type-vehicle" class="visually-hidden">TypeVehicle</label>
+                    <input type="text" class="form-control" id="type-vehicle" placeholder="TypeVehicle"/>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" id="btn-search" class="btn btn-primary mb-3">Search</button>
+                </div>
+            </form>
+        </div>
+        <p id="demo19"></p>
+        <p id="demo1"></p>
+        <p id="demo2"></p>
+        <p id="demo3"></p>
+        <p id="demo0"></p>
+        <p id="demo11"></p>
+        <p id="demo12"></p>
+        <p id="demo13"></p>
+        <p id="demo10"></p>
+        <div id="feedback"></div>
+    </div>
+</div>
+<script th:src="@{/js/bootstrap.bundle.js}"></script>
+<script th:src="@{/js/jquery.min.js}"></script>
+<script th:src="@{/js/ajax_search_cold_penalty.js}"></script>
+</body>
+</html>

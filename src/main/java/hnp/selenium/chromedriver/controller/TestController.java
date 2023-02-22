@@ -33,7 +33,7 @@ public class TestController {
         String i18nMessage = messageUtils.populate(ApiResponseCode.SUCCESS.getMessage());
         ColdPenaltyRes dataRes = new ColdPenaltyRes();
         testService.parseData(Constants.DATA, req);
-        dataRes.setData1("data response");
+        dataRes.setData("data response");
         return RestResponseWrapper.getResponse(ApiResponseCode.SUCCESS, i18nMessage, dataRes);
     }
 }
