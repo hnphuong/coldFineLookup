@@ -15,6 +15,7 @@ public class Constants {
     public static final String SEARCH_NOT_FOUND = "Không tìm thấy kết quả !";
     public static final String CAPTCHA_NOT_MATCH = "Mã xác nhận sai!";
     public static final String URL_BASE = "https://www.csgt.vn/tra-cuu-phuong-tien-vi-pham.html";
+    public static final String URL_BASE_MOBILE = "https://www.csgt.vn/m/tra-cuu-phuong-tien-vi-pham.html";
 
     public static final String LICENSE_PLATES = "Biển kiểm soát";
     public static final String LICENSE_PLATES_COLOR = "Màu biển";

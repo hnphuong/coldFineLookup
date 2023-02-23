@@ -8,6 +8,7 @@ import hnp.selenium.chromedriver.model.SanctionDetail;
 import hnp.selenium.chromedriver.model.SanctionInformation;
 import hnp.selenium.chromedriver.repository.SanctionInformationRepository;
 import hnp.selenium.chromedriver.utils.DateUtil;
+import io.github.bonigarcia.wdm.WebDriverManager;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sourceforge.tess4j.Tesseract;
@@ -18,9 +19,17 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.openqa.selenium.*;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.devtools.DevTools;
+import org.openqa.selenium.devtools.v109.emulation.Emulation;
 import org.openqa.selenium.support.ui.Select;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
+import ru.yandex.qatools.ashot.AShot;
+import ru.yandex.qatools.ashot.Screenshot;
+import ru.yandex.qatools.ashot.comparison.ImageDiff;
+import ru.yandex.qatools.ashot.comparison.ImageDiffer;
+import ru.yandex.qatools.ashot.shooting.ShootingStrategies;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -45,22 +54,39 @@ public class TestService {
             chromeDriverService.close();
             data = this.getResultSearch(req);
             i++;
-        } while (i <= 3);
+        } while (i < 3);
         assert data != null;
         if (!data.isBlank() && !data.equals(Constants.SEARCH_NOT_FOUND) && !data.equals(Constants.CAPTCHA_NOT_MATCH)) {
             log.debug(data);
             this.parseData(data, req);
-        }else{
-            String uniqueKey = req.getLicensePlates() + "#" + req.getTypeVehicle().toString();
+        } else {
+            String uniqueKey = req.getLicensePlates() + "#" + req.getTypeVehicle();
             Optional<SanctionInformation> isSanctionInformation = sanctionInformationRepository.findByUniqueKey(uniqueKey);
-            if(isSanctionInformation.isPresent()){
+            if (isSanctionInformation.isPresent()) {
                 data = isSanctionInformation.get().getResourceOriginal();
-            }else {
+            } else {
                 data = "";
             }
         }
         chromeDriverService.close();
         return data;
+    }
+
+    public String testBrowsers() {
+        try {
+            chromeDriverService.openChromeDriver();
+            ChromeDriver driver = chromeDriverService.getChromeDriver();
+            driver.get(Constants.URL_BASE_MOBILE);
+            WebElement element = driver.findElement(By.xpath ("/html/body/div[1]/div[4]/div[2]/div/div[1]/form/div/div[2]/div[3]"));
+            // Along with driver pass element also in takeScreenshot() method.
+            //Screenshot logoElementScreenshot = new AShot().takeScreenshot(driver, element);
+            Screenshot screenshot = new AShot().shootingStrategy(ShootingStrategies.viewportPasting(1000)).takeScreenshot(driver,element);
+            ImageIO.write(screenshot.getImage(), "jpg", new File("D:\\ElementScreenshot1.jpg"));
+            // read the image to compare
+        }catch (Exception e){
+
+        }
+        return ">>>>>>>>> test<<<<<<<<<<";
     }
 
     private String getResultSearch(ColdPenaltyReq req) {
@@ -85,8 +111,6 @@ public class TestService {
             txtCaptcha.sendKeys(this.removeSpecialCharacters(captcha.replace("Z", "7").replace("H", "5").toLowerCase()));
             WebElement search = driver.findElement(By.className("btnTraCuu"));
             search.click();
-            //WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
-            //wait.until(webDriver -> !webDriver.findElement(By.className("xe_texterror")).getText().isBlank());
             Thread.sleep(4000);
             WebElement resultCaptcha = driver.findElement(By.className("xe_texterror"));
             if (resultCaptcha.getText().equals(Constants.CAPTCHA_NOT_MATCH)) return Constants.CAPTCHA_NOT_MATCH;

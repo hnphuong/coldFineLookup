@@ -18,7 +18,7 @@
     <main>
         <nav class="navbar navbar-expand-lg navbar-dark bg-success text-white" aria-label="navbar large">
             <div class="container-fluid">
-                <a class="navbar-brand" href="#">Trang chủ</a>
+                <a class="navbar-brand" href="#">Tra cứu phạt nguội</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas"
                         data-bs-target="#offcanvasNavbar2" aria-controls="offcanvasNavbar2">
                     <span class="navbar-toggler-icon"></span>
@@ -31,62 +31,64 @@
                                 aria-label="Close"></button>
                     </div>
                     <div class="offcanvas-body">
-                        <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
-                            <li class="nav-item">
-                                <a class="nav-link active" aria-current="page" href="/">Thông tin</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#">Link</a>
-                            </li>
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                                   aria-expanded="false">
-                                    Dropdown
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="#">Action</a></li>
-                                    <li><a class="dropdown-item" href="#">Another action</a></li>
-                                    <li>
-                                        <hr class="dropdown-divider">
-                                    </li>
-                                    <li><a class="dropdown-item" href="#">Something else here</a></li>
-                                </ul>
-                            </li>
-                        </ul>
+                        <!--                        <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">-->
+                        <!--                            <li class="nav-item">-->
+                        <!--                                <a class="nav-link active" aria-current="page" href="/">Tra cứu phạt nguội</a>-->
+                        <!--                            </li>-->
+                        <!--                            <li class="nav-item">-->
+                        <!--                                <a class="nav-link" href="#">Link</a>-->
+                        <!--                            </li>-->
+                        <!--                            <li class="nav-item dropdown">-->
+                        <!--                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"-->
+                        <!--                                   aria-expanded="false">-->
+                        <!--                                    Dropdown-->
+                        <!--                                </a>-->
+                        <!--                                <ul class="dropdown-menu">-->
+                        <!--                                    <li><a class="dropdown-item" href="#">Action</a></li>-->
+                        <!--                                    <li><a class="dropdown-item" href="#">Another action</a></li>-->
+                        <!--                                    <li>-->
+                        <!--                                        <hr class="dropdown-divider">-->
+                        <!--                                    </li>-->
+                        <!--                                    <li><a class="dropdown-item" href="#">Something else here</a></li>-->
+                        <!--                                </ul>-->
+                        <!--                            </li>-->
+                        <!--                        </ul>-->
                     </div>
                 </div>
             </div>
         </nav>
         <!-- end menu -->
         <div class="py-3 text-center">
-            <img class="d-block mx-auto mb-4" th:src="@{/assets/logo/main.png}" alt="logo"/>
-            <h2>Checkout form</h2>
-            <p class="lead">Below is an example form built entirely with Bootstrap’s form controls.</p>
+<!--            <img class="d-block mx-auto mb-4" th:src="@{/assets/logo/main.png}" alt="logo"/>-->
+<!--            <h2>Tra cứu phạt nguội ngay!</h2>-->
+            <h1>Test --> </h1>
+            <!--            <p class="lead">Below is an example form built entirely with Bootstrap’s form controls.</p>-->
         </div>
         <div class="row g-5">
-            <form class="needs-validation" novalidate>
+            <form class="needs-validation" novalidate action="#" id="search-cold-penalty">
                 <div class="row g-3">
                     <div class="col-md-5">
-                        <label for="firstName" class="form-label">First name</label>
-                        <input type="text" class="form-control" id="firstName" placeholder="" value="" required>
+                        <label for="license-plates" class="form-label">Biển số xe</label>
+                        <input type="text" class="form-control" id="license-plates" placeholder="29A12345" required>
                         <div class="invalid-feedback">
-                            Valid first name is required.
+                            Biển số xe is required.
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <label for="state" class="form-label">State</label>
-                        <select class="form-select" id="state" required>
-                            <option value="">Choose...</option>
-                            <option>California</option>
+                        <label for="type-vehicle" class="form-label">Loại phương tiện</label>
+                        <select class="form-select" id="type-vehicle" required>
+                            <option value="1">Ô tô</option>
+                            <option value="2">Xe máy</option>
+                            <option value="3">Xe đạp</option>
                         </select>
                         <div class="invalid-feedback">
-                            Please provide a valid state.
+                            Phương tiện is required.
                         </div>
                     </div>
                     <div class="col-md-3">
-                        <label for="state" class="form-label">State</label>
+                        <label class="form-label">Tìm kiếm</label>
                         <div class="text-center">
-                            <button class="btn btn-primary" type="submit">Search</button>
+                            <button class="btn btn-primary" type="submit" id="btn-search">Tìm kiếm</button>
                         </div>
                     </div>
                 </div>
@@ -94,27 +96,38 @@
         </div>
         <hr class="my-4">
         <div class="container">
-            <div class="row">
-                <div class="col-sm-6 pb-3" th:each="mapItem, state : ${map}">
-                    <div class="card shadow-lg bg-body rounded">
-                        <div class="card-body">
-                            <div class="card-header">
-                                <h5 class="text-danger"><i class="fa fa-frown-o" aria-hidden="true"></i> Lần: <span
-                                        th:utext="${state.count}"></span></h5>
-                            </div>
-                            <ul class="list-group list-group-flush">
-                                <li class="list-group-item" th:each="data : ${mapItem.value}"
-                                    th:utext="${data}"><span><i
-                                        class="fa fa-check" aria-hidden="true"></i></span></li>
-                            </ul>
-                        </div>
+            <div class="row" id="feedback-response-search">
+                <div class="col-12 d-flex justify-content-center d-none" id="loading">
+                    <div class="spinner-grow text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <div class="spinner-grow text-secondary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <div class="spinner-grow text-success" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <div class="spinner-grow text-danger" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <div class="spinner-grow text-warning" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <div class="spinner-grow text-info" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <div class="spinner-grow text-light" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <div class="spinner-grow text-dark" role="status">
+                        <span class="visually-hidden">Loading...</span>
                     </div>
                 </div>
             </div>
         </div>
     </main>
     <footer class="my-5 pt-5 text-muted text-center text-small">
-        <p class="mb-1">&copy; 2017–2022 Company Name</p>
+        <p class="mb-1">&copy; 2020–2023 Company Name</p>
         <ul class="list-inline">
             <li class="list-inline-item"><a href="#">Privacy</a></li>
             <li class="list-inline-item"><a href="#">Terms</a></li>
@@ -124,6 +137,8 @@
 </div>
 <script th:src="@{/js/bootstrap.bundle.js}"></script>
 <script th:src="@{/js/checkout.js}"></script>
+<script th:src="@{/js/jquery.min.js}"></script>
+<script th:src="@{/js/ajax_search_cold_penalty.js}"></script>
 </body>
 
 </html>

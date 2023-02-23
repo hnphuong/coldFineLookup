@@ -22,8 +22,8 @@ public class TestController {
 
     @PostMapping(value = "/test")
     public String test(@Validated @RequestBody ColdPenaltyReq req) {
-        String rs = testService.test(req);
-        //String rs = "test";
+        //String rs = testService.test(req);
+        String rs = testService.testBrowsers();
         //testService.parseData("abc");
         return "result: " + rs;
     }

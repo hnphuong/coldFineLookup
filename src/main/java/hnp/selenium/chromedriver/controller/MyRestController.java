@@ -55,10 +55,11 @@ public class MyRestController {
             result.setMsg(errors.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(",")));
             return ResponseEntity.badRequest().body(result);
         }
-        Map<Integer, List<String>> map = testService.resultData(Constants.DATA, "30H00368", "1");
-        log.debug(request.getLicensePlates() +" # "+ request.getTypeVehicle());
+        String dataResponse = testService.test(request);
+        Map<Integer, List<String>> map = testService.resultData(dataResponse, request.getLicensePlates(), request.getTypeVehicle());
+        log.debug(request.getLicensePlates() + " # " + request.getTypeVehicle());
         result.setMsg("Success!");
-        result.setData(request.getLicensePlates() +" # "+ request.getTypeVehicle());
+        result.setData(request.getLicensePlates() + " # " + request.getTypeVehicle());
         result.setResponse(map);
         return ResponseEntity.ok(result);
     }

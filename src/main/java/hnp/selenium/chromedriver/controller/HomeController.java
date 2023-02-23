@@ -5,8 +5,7 @@ import hnp.selenium.chromedriver.dto.User;
 import hnp.selenium.chromedriver.dto.request.ColdPenaltyReq;
 import hnp.selenium.chromedriver.service.TestService;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,11 +19,11 @@ import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
+@Slf4j
 public class HomeController {
-    private static final Logger log = LoggerFactory.getLogger(HomeController.class);
     private final TestService testService;
 
-    @RequestMapping("/index")
+    @RequestMapping("/")
     public String index(Model model) {
         Map<Integer, List<String>> map = testService.resultData(Constants.DATA, "30H00368", "1");
         log.info("Spring Boot Thymeleaf Configuration Example");

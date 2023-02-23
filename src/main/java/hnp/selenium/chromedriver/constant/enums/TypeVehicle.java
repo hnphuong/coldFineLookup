@@ -18,9 +18,9 @@ public enum TypeVehicle {
         this.description = description;
     }
 
-    public static String findTypeVehicleByCode(int type) {
+    public static String findTypeVehicleByCode(String code) {
         for (TypeVehicle typeVehicle : TypeVehicle.values()) {
-            if (typeVehicle.getType() == type)
+            if (typeVehicle.getCode().equals(code))
                 return typeVehicle.getCode();
         }
         return "1";

@@ -7,5 +7,5 @@ import lombok.Setter;
 @Setter
 public class ColdPenaltyReq {
     private String licensePlates;
-    private Integer typeVehicle;
+    private String typeVehicle;
 }
