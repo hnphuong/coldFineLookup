@@ -10,7 +10,7 @@ import java.util.Map;
 @Setter
 public class ColdPenaltyRes {
     private String msg;
-    private String data;
+    private Integer status;
     private Map<Integer, List<String>> response;
 }
 

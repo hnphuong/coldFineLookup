@@ -22,8 +22,8 @@ public class TestController {
 
     @PostMapping(value = "/test")
     public String test(@Validated @RequestBody ColdPenaltyReq req) {
-        //String rs = testService.test(req);
-        String rs = testService.testBrowsers();
+        String rs = testService.test(req);
+        //String rs = testService.testBrowsers();
         //testService.parseData("abc");
         return "result: " + rs;
     }
@@ -33,7 +33,7 @@ public class TestController {
         String i18nMessage = messageUtils.populate(ApiResponseCode.SUCCESS.getMessage());
         ColdPenaltyRes dataRes = new ColdPenaltyRes();
         testService.parseData(Constants.DATA, req);
-        dataRes.setData("data response");
+        dataRes.setStatus(1);
         return RestResponseWrapper.getResponse(ApiResponseCode.SUCCESS, i18nMessage, dataRes);
     }
 }

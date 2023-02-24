@@ -56,10 +56,15 @@ public class MyRestController {
             return ResponseEntity.badRequest().body(result);
         }
         String dataResponse = testService.test(request);
-        Map<Integer, List<String>> map = testService.resultData(dataResponse, request.getLicensePlates(), request.getTypeVehicle());
+        Map<Integer, List<String>> map = testService.resultData(dataResponse, request.getLicensePlates(), request.getTypeVehicle());//Constants.DATA
         log.debug(request.getLicensePlates() + " # " + request.getTypeVehicle());
-        result.setMsg("Success!");
-        result.setData(request.getLicensePlates() + " # " + request.getTypeVehicle());
+        if (map.isEmpty()) {
+            result.setMsg("Thất bại");
+            result.setStatus(0);
+        } else {
+            result.setMsg("Thành công");
+            result.setStatus(1);
+        }
         result.setResponse(map);
         return ResponseEntity.ok(result);
     }

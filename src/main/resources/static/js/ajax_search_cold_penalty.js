@@ -14,7 +14,10 @@ const responseHtml = "<div class=\"col-sm-6 pb-3\">\n" +
     "                    </div>\n" +
     "                </div>\n" +
     "            </div>";
-const detailLi = "                            <li class=\"list-group-item\"><i class=\"fa fa-check\" aria-hidden=\"true\"></i> " + infoViolate + " </li>\n"
+const detailLi = "                            <li class=\"list-group-item\"><i class=\"fa fa-check\" aria-hidden=\"true\"></i> " + infoViolate + " </li>\n";
+const notFound = "<div class=\"col-12 d-flex justify-content-center\">\n" +
+    "                    <h4> Không tìm thấy kết quả !</h4>\n" +
+    "                </div>";
 $("#search-cold-penalty").submit(function (event) {
     //stop submit the form event. Do this manually using ajax post function
     event.preventDefault();
@@ -33,32 +36,37 @@ $("#search-cold-penalty").submit(function (event) {
         timeout: 600000,
         success: function (data) {
             let responseData = JSON.stringify(data, null, 4);
-            let json = "<h4>Ajax Response</h4><pre>"
-                + responseData + "</pre>";
-            $('#feedback').html(json);
+            //let json = "<h4>Ajax Response</h4><pre>"
+                //+ responseData + "</pre>";
+            //$('#feedback').html(json);
             console.log("SUCCESS : ", data);
             // end push html to web
             let responseObj = JSON.parse(responseData);
-            let mapObj = new Map(Object.entries(responseObj.response));
+            let status = responseObj.status;
             let resultRes = "";
-            for (let i = 0; i < mapObj.size; i++) {
-                let root = responseHtml.replace(quantityViolate, [i].toString());
-                let liList = mapObj.get([i].toString()).entries();
-                let aLi = "";
-                for (let x of liList) {
-                    let replace1 = detailLi.replace(infoViolate, x[1]);
-                    aLi = aLi.concat(" ", replace1);
+            if (status === 1) {
+                let mapObj = new Map(Object.entries(responseObj.response));
+                for (let i = 0; i < mapObj.size; i++) {
+                    console.log("count: " + (i + 1));
+                    let root = responseHtml.replace(quantityViolate, (i + 1).toString());
+                    let liList = mapObj.get([i].toString()).entries();
+                    let aLi = "";
+                    for (let x of liList) {
+                        let replace1 = detailLi.replace(infoViolate, x[1]);
+                        aLi = aLi.concat(" ", replace1);
+                    }
+                    let replace0 = root.replace(replaceLi, aLi);
+                    resultRes = resultRes.concat(" ", replace0);
                 }
-                let replace0 = root.replace(replaceLi, aLi);
-                resultRes = resultRes.concat(" ", replace0);
+            } else {
+                resultRes = notFound;
             }
             $('#feedback-response-search').html(resultRes);
-            console.log("resultRes: " + resultRes);
             $("#btn-search").prop("disabled", false);
             $("#loading").addClass("d-none");
         },
         error: function (e) {
-            let json = "<h4>Ajax Response Error</h4><pre>"
+            let json = "<h4>Response Error</h4><pre>"
                 + e.responseText + "</pre>";
             $('#feedback').html(json);
             console.log("ERROR : ", e);

@@ -8,7 +8,6 @@ import hnp.selenium.chromedriver.model.SanctionDetail;
 import hnp.selenium.chromedriver.model.SanctionInformation;
 import hnp.selenium.chromedriver.repository.SanctionInformationRepository;
 import hnp.selenium.chromedriver.utils.DateUtil;
-import io.github.bonigarcia.wdm.WebDriverManager;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sourceforge.tess4j.Tesseract;
@@ -19,17 +18,9 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.openqa.selenium.*;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.devtools.DevTools;
-import org.openqa.selenium.devtools.v109.emulation.Emulation;
 import org.openqa.selenium.support.ui.Select;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
-import ru.yandex.qatools.ashot.AShot;
-import ru.yandex.qatools.ashot.Screenshot;
-import ru.yandex.qatools.ashot.comparison.ImageDiff;
-import ru.yandex.qatools.ashot.comparison.ImageDiffer;
-import ru.yandex.qatools.ashot.shooting.ShootingStrategies;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -57,7 +48,6 @@ public class TestService {
         } while (i < 3);
         assert data != null;
         if (!data.isBlank() && !data.equals(Constants.SEARCH_NOT_FOUND) && !data.equals(Constants.CAPTCHA_NOT_MATCH)) {
-            log.debug(data);
             this.parseData(data, req);
         } else {
             String uniqueKey = req.getLicensePlates() + "#" + req.getTypeVehicle();
@@ -72,28 +62,11 @@ public class TestService {
         return data;
     }
 
-    public String testBrowsers() {
-        try {
-            chromeDriverService.openChromeDriver();
-            ChromeDriver driver = chromeDriverService.getChromeDriver();
-            driver.get(Constants.URL_BASE_MOBILE);
-            WebElement element = driver.findElement(By.xpath ("/html/body/div[1]/div[4]/div[2]/div/div[1]/form/div/div[2]/div[3]"));
-            // Along with driver pass element also in takeScreenshot() method.
-            //Screenshot logoElementScreenshot = new AShot().takeScreenshot(driver, element);
-            Screenshot screenshot = new AShot().shootingStrategy(ShootingStrategies.viewportPasting(1000)).takeScreenshot(driver,element);
-            ImageIO.write(screenshot.getImage(), "jpg", new File("D:\\ElementScreenshot1.jpg"));
-            // read the image to compare
-        }catch (Exception e){
-
-        }
-        return ">>>>>>>>> test<<<<<<<<<<";
-    }
-
     private String getResultSearch(ColdPenaltyReq req) {
         try {
             chromeDriverService.setupChromeDriver();
             WebDriver driver = chromeDriverService.getDriver();
-            driver.get(Constants.URL_BASE);
+            driver.get(Constants.URL_BASE_MOBILE);
             String captcha;
             String nameImage = UUID.randomUUID().toString();
             File fileCaptcha = this.takeSnapShot(driver, Constants.RESOURCE_ORIGIN.replace("###", nameImage), nameImage);
@@ -103,7 +76,7 @@ public class TestService {
                 return null;
             }
             WebElement licensePlates = driver.findElement(By.name("BienKiemSoat"));
-            licensePlates.sendKeys(req.getLicensePlates());
+            licensePlates.sendKeys(this.removeSpecialCharacters(req.getLicensePlates().trim()));
             Select drpTypeVehicle = new Select(driver.findElement(By.name("LoaiXe")));
             drpTypeVehicle.selectByValue(TypeVehicle.findTypeVehicleByCode(req.getTypeVehicle()));
             WebElement txtCaptcha = driver.findElement(By.name("txt_captcha"));
@@ -111,7 +84,7 @@ public class TestService {
             txtCaptcha.sendKeys(this.removeSpecialCharacters(captcha.replace("Z", "7").replace("H", "5").toLowerCase()));
             WebElement search = driver.findElement(By.className("btnTraCuu"));
             search.click();
-            Thread.sleep(4000);
+            Thread.sleep(2000);
             WebElement resultCaptcha = driver.findElement(By.className("xe_texterror"));
             if (resultCaptcha.getText().equals(Constants.CAPTCHA_NOT_MATCH)) return Constants.CAPTCHA_NOT_MATCH;
             WebElement resultSearch = driver.findElement(By.id("bodyPrint123"));
@@ -128,18 +101,19 @@ public class TestService {
         for (int i = 0; i < data.length; i++) {
             parse.put(i, this.analysisHtml(data[i]));
         }
-        this.createSanctionInformation(parse, dataHtml, req.getLicensePlates(), req.getTypeVehicle().toString());
-        log.debug("parse: " + parse.size());
+        this.createSanctionInformation(parse, dataHtml, req.getLicensePlates(), req.getTypeVehicle());
     }
 
     public Map<Integer, List<String>> resultData(String dataHtml, String licensePlates, String typeVehicle) {
         String[] data = dataHtml.split("<hr style=\"margin-bottom: 25px;\">");
         Map<Integer, List<String>> parse = new HashMap<>();
         for (int i = 0; i < data.length; i++) {
-            parse.put(i, this.analysisHtml(data[i]));
+            List<String> dataAnalysis = this.analysisHtml(data[i]);
+            if (!dataAnalysis.isEmpty()) {
+                parse.put(i, this.analysisHtml(data[i]));
+            }
         }
         this.createSanctionInformation(parse, dataHtml, licensePlates, typeVehicle);
-        log.debug("parse: " + parse.size());
         return parse;
     }
 
@@ -249,7 +223,12 @@ public class TestService {
             //Copy file at destination
             FileUtils.copyFile(srcFile, destFile);
             BufferedImage bufferedImage = ImageIO.read(srcFile);
-            BufferedImage subImg = cropImageService.cropImage(bufferedImage, 1290, 412, 180, 40);
+            int x = 40;//this.calculateImage(bufferedImage.getWidth(), 7);
+            int y = 550;//this.calculateImage(bufferedImage.getHeight(), 58);
+            int w = 500;//this.calculateImage(bufferedImage.getWidth(), 55);
+            int h = 110;//this.calculateImage(bufferedImage.getHeight(), 14);
+            bufferedImage.getHeight();
+            BufferedImage subImg = cropImageService.cropImage(bufferedImage, x, y, w, h);
             File pathFile = new File(Constants.RESOURCE_ORIGIN_CUT.replace("###", nameImage));
             ImageIO.write(subImg, "png", pathFile);
             return pathFile;
@@ -259,12 +238,15 @@ public class TestService {
         }
     }
 
+    private Integer calculateImage(Integer length, Integer percent) {
+        return (length * percent) / 100;
+    }
+
     private String removeSpecialCharacters(String value) {
         if (value == null) return "";
         for (int i = 0; i < value.length(); i++) {
             char ch = value.charAt(i);
-            if ((ch < 'A' || ch > 'Z') && (ch < 'a' || ch > 'z')
-                    && (ch < '0' || ch > '9')) {
+            if ((ch < 'A' || ch > 'Z') && (ch < 'a' || ch > 'z') && (ch < '0' || ch > '9')) {
                 value = value.substring(0, i) + value.substring(i + 1);
                 i--;
             }

@@ -2,6 +2,7 @@ package hnp.selenium.chromedriver.service;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
 import lombok.Getter;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.devtools.DevTools;
@@ -45,11 +46,11 @@ public class ChromeDriverService {
     }
 
     public void options() {
-        driver.manage().window().maximize();
+        driver.manage().window().setSize(new Dimension(375, 812));
     }
 
     public void optionsChrome() {
-        chromeDriver.manage().window().maximize();
+        chromeDriver.manage().window().setSize(new Dimension(375, 812));
     }
 
     public void close() {
