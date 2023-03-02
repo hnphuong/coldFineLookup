@@ -11,7 +11,9 @@ public class Constants {
     public static final String RISKFREERATE = "RISKFREERATE";
     public static final String CTBERR403 = "CTBERR403";
     public static final String RESOURCE_ORIGIN = "D:\\test_img\\###.png";
+    public static final String RESOURCE_ORIGIN_SERVER = "/home/vehicle/Workspace/coldPenalty/capImages/###.png";
     public static final String RESOURCE_ORIGIN_CUT = "D:\\test_img\\###_cut.png";
+    public static final String RESOURCE_ORIGIN_CUT_SERVER = "/home/vehicle/Workspace/coldPenalty/capImages/###_cut.png";
     public static final String SEARCH_NOT_FOUND = "Không tìm thấy kết quả !";
     public static final String CAPTCHA_NOT_MATCH = "Mã xác nhận sai!";
     public static final String URL_BASE = "https://www.csgt.vn/tra-cuu-phuong-tien-vi-pham.html";

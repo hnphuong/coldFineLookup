@@ -69,7 +69,7 @@ public class TestService {
             driver.get(Constants.URL_BASE_MOBILE);
             String captcha;
             String nameImage = UUID.randomUUID().toString();
-            File fileCaptcha = this.takeSnapShot(driver, Constants.RESOURCE_ORIGIN.replace("###", nameImage), nameImage);
+            File fileCaptcha = this.takeSnapShot(driver, Constants.RESOURCE_ORIGIN_SERVER.replace("###", nameImage), nameImage);
             if (fileCaptcha != null) {
                 captcha = this.readImage(fileCaptcha);
             } else {
@@ -223,13 +223,13 @@ public class TestService {
             //Copy file at destination
             FileUtils.copyFile(srcFile, destFile);
             BufferedImage bufferedImage = ImageIO.read(srcFile);
-            int x = 40;//this.calculateImage(bufferedImage.getWidth(), 7);
-            int y = 550;//this.calculateImage(bufferedImage.getHeight(), 58);
-            int w = 500;//this.calculateImage(bufferedImage.getWidth(), 55);
-            int h = 110;//this.calculateImage(bufferedImage.getHeight(), 14);
+            int x = 25;//40;//this.calculateImage(bufferedImage.getWidth(), 7);
+            int y = 370;//550;//this.calculateImage(bufferedImage.getHeight(), 58);
+            int w = 330;//500;//this.calculateImage(bufferedImage.getWidth(), 55);
+            int h = 70;//110;//this.calculateImage(bufferedImage.getHeight(), 14);
             bufferedImage.getHeight();
             BufferedImage subImg = cropImageService.cropImage(bufferedImage, x, y, w, h);
-            File pathFile = new File(Constants.RESOURCE_ORIGIN_CUT.replace("###", nameImage));
+            File pathFile = new File(Constants.RESOURCE_ORIGIN_CUT_SERVER.replace("###", nameImage));
             ImageIO.write(subImg, "png", pathFile);
             return pathFile;
         } catch (Exception ex) {
