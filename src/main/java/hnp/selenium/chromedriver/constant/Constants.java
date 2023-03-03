@@ -5,11 +5,11 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class Constants {
     public static final int PAGING_STEP = 1;
-    public static final String CTBERR400 = "CTBERR400";
-    public static final String CTBERR404 = "CTBERR404";
-    public static final String CTBERR401 = "CTBERR401";
+    public static final String CTBERR400 = "CP400";
+    public static final String CTBERR404 = "CP404";
+    public static final String CTBERR401 = "CP401";
     public static final String RISKFREERATE = "RISKFREERATE";
-    public static final String CTBERR403 = "CTBERR403";
+    public static final String CTBERR403 = "CP403";
     public static final String RESOURCE_ORIGIN = "D:\\test_img\\###.png";
     public static final String RESOURCE_ORIGIN_SERVER = "/home/vehicle/Workspace/coldPenalty/capImages/###.png";
     public static final String RESOURCE_ORIGIN_CUT = "D:\\test_img\\###_cut.png";

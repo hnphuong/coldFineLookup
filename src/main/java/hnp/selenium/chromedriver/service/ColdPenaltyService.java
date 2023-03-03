@@ -33,6 +33,7 @@ public class ColdPenaltyService {
     private final ChromeDriverService chromeDriverService;
     private final CropImageService cropImageService;
     private final SanctionInformationRepository sanctionInformationRepository;
+    private final Tesseract tesseract;
 
     public String getColdPenalty(ColdPenaltyReq req) {
         String data = this.getResultSearch(req);
@@ -202,12 +203,12 @@ public class ColdPenaltyService {
 
     public String readImage(File fileImage) {
         try {
-            Tesseract tesseract = new Tesseract();
-            File file = new File(Constants.RESOURCE_TESSERACT_TEST);
-            tesseract.setDatapath(file.getPath());
-            tesseract.setLanguage("eng");
-            tesseract.setPageSegMode(1);
-            tesseract.setOcrEngineMode(1);
+//            Tesseract tesseract = new Tesseract();
+//            File file = new File(Constants.RESOURCE_TESSERACT_TEST);
+//            tesseract.setDatapath(file.getPath());
+//            tesseract.setLanguage("eng");
+//            tesseract.setPageSegMode(1);
+//            tesseract.setOcrEngineMode(1);
             return tesseract.doOCR(fileImage);
         } catch (TesseractException e) { //| IOException e
             log.debug("OCR Image: " + e.getMessage());
@@ -226,14 +227,18 @@ public class ColdPenaltyService {
             //Copy file at destination
             FileUtils.copyFile(srcFile, destFile);
             BufferedImage bufferedImage = ImageIO.read(srcFile);
-//            int x = 25;//40;//this.calculateImage(bufferedImage.getWidth(), 7);
-//            int y = 370;//550;//this.calculateImage(bufferedImage.getHeight(), 58);
-//            int w = 330;//500;//this.calculateImage(bufferedImage.getWidth(), 55);
-//            int h = 70;//110;//this.calculateImage(bufferedImage.getHeight(), 14);
-            int x = 40;//this.calculateImage(bufferedImage.getWidth(), 7);
-            int y = 550;//this.calculateImage(bufferedImage.getHeight(), 58);
-            int w = 500;//this.calculateImage(bufferedImage.getWidth(), 55);
-            int h = 110;//this.calculateImage(bufferedImage.getHeight(), 14);
+            int x = 25;
+            int y = 370;
+            int w = 330;
+            int h = 70;
+//            int x = 40;
+//            int y = 550;
+//            int w = 500;
+//            int h = 110;
+//            int x = 40;
+//            int y = 460;
+//            int w = 400;
+//            int h = 90;
             bufferedImage.getHeight();
             BufferedImage subImg = cropImageService.cropImage(bufferedImage, x, y, w, h);
             File pathFile = new File(Constants.RESOURCE_ORIGIN_CUT_SERVER.replace("###", nameImage));
@@ -243,10 +248,6 @@ public class ColdPenaltyService {
             log.debug("error takeSnapShot: " + ex.getMessage());
             return null;
         }
-    }
-
-    private Integer calculateImage(Integer length, Integer percent) {
-        return (length * percent) / 100;
     }
 
     private String removeSpecialCharacters(String value) {
