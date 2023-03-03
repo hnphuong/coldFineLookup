@@ -12,6 +12,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.TesseractException;
+import net.sourceforge.tess4j.util.LoadLibs;
 import org.apache.commons.io.FileUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -19,13 +20,18 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.Select;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 @Service
@@ -35,6 +41,7 @@ public class TestService {
     private ChromeDriverService chromeDriverService;
     private CropImageService cropImageService;
     private SanctionInformationRepository sanctionInformationRepository;
+    private final Tesseract tesseract;
 
     public String test(ColdPenaltyReq req) {
         String data = this.getResultSearch(req);
@@ -70,11 +77,13 @@ public class TestService {
             String captcha;
             String nameImage = UUID.randomUUID().toString();
             File fileCaptcha = this.takeSnapShot(driver, Constants.RESOURCE_ORIGIN_SERVER.replace("###", nameImage), nameImage);
+            log.debug("fileCaptcha: " + fileCaptcha);
             if (fileCaptcha != null) {
                 captcha = this.readImage(fileCaptcha);
             } else {
                 return null;
             }
+            log.debug("captcha: " + captcha);
             WebElement licensePlates = driver.findElement(By.name("BienKiemSoat"));
             licensePlates.sendKeys(this.removeSpecialCharacters(req.getLicensePlates().trim()));
             Select drpTypeVehicle = new Select(driver.findElement(By.name("LoaiXe")));
@@ -200,13 +209,23 @@ public class TestService {
         return "";
     }
 
-    private String readImage(File fileImage) {
-        Tesseract tesseract = new Tesseract();
+    public String readImage(File fileImage) {
+        //File tmpFolder = LoadLibs.extractTessResources("win32-x86-64");
+        //System.setProperty("java.library.path", tmpFolder.getPath());
+        //Tesseract tesseract = new Tesseract();
         try {
-            String resource = new ClassPathResource("tesseract").getFile().getCanonicalPath();
-            tesseract.setDatapath(resource);
+            //String resource1 = new ClassPathResource("tesseract").getFile().getCanonicalPath();//Constants.RESOURCE_TESSERACT;
+            //log.debug("resource tesseract: " + resource1);
+            //Path dataDirectory = Paths.get(ClassLoader.getSystemResource("tessdata").toURI());
+            //File file = new File(Constants.RESOURCE_TESSERACT);
+            //Path dataDirectory = Paths.get(ClassLoader.getSystemResource("tesseract").toURI());
+            //tesseract.setDatapath(dataDirectory.toString());
+            //tesseract.setDatapath(file.getPath());
+            //tesseract.setLanguage("eng");
+            //tesseract.setPageSegMode(1);
+            //tesseract.setOcrEngineMode(1);
             return tesseract.doOCR(fileImage);
-        } catch (TesseractException | IOException e) {
+        } catch (TesseractException e) { //| IOException e
             log.debug("OCR Image: " + e.getMessage());
             return null;
         }
@@ -227,13 +246,17 @@ public class TestService {
             int y = 370;//550;//this.calculateImage(bufferedImage.getHeight(), 58);
             int w = 330;//500;//this.calculateImage(bufferedImage.getWidth(), 55);
             int h = 70;//110;//this.calculateImage(bufferedImage.getHeight(), 14);
+//            int x = 40;//this.calculateImage(bufferedImage.getWidth(), 7);
+//            int y = 550;//this.calculateImage(bufferedImage.getHeight(), 58);
+//            int w = 500;//this.calculateImage(bufferedImage.getWidth(), 55);
+//            int h = 110;//this.calculateImage(bufferedImage.getHeight(), 14);
             bufferedImage.getHeight();
             BufferedImage subImg = cropImageService.cropImage(bufferedImage, x, y, w, h);
             File pathFile = new File(Constants.RESOURCE_ORIGIN_CUT_SERVER.replace("###", nameImage));
             ImageIO.write(subImg, "png", pathFile);
             return pathFile;
         } catch (Exception ex) {
-            log.debug("error: " + ex.getMessage());
+            log.debug("error takeSnapShot: " + ex.getMessage());
             return null;
         }
     }

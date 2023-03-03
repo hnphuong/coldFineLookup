@@ -13,6 +13,8 @@ public class Constants {
     public static final String RESOURCE_ORIGIN = "D:\\test_img\\###.png";
     public static final String RESOURCE_ORIGIN_SERVER = "/home/vehicle/Workspace/coldPenalty/capImages/###.png";
     public static final String RESOURCE_ORIGIN_CUT = "D:\\test_img\\###_cut.png";
+    public static final String RESOURCE_TESSERACT = "/home/vehicle/Workspace/coldPenalty/install/tessdata";
+    public static final String RESOURCE_TESSERACT_TEST = "D:\\test_img\\tesseract";
     public static final String RESOURCE_ORIGIN_CUT_SERVER = "/home/vehicle/Workspace/coldPenalty/capImages/###_cut.png";
     public static final String SEARCH_NOT_FOUND = "Không tìm thấy kết quả !";
     public static final String CAPTCHA_NOT_MATCH = "Mã xác nhận sai!";
