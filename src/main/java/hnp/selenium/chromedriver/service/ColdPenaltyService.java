@@ -12,7 +12,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.TesseractException;
-import net.sourceforge.tess4j.util.LoadLibs;
 import org.apache.commons.io.FileUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -20,30 +19,22 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.Select;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 
 @Service
 @AllArgsConstructor
 @Slf4j
-public class TestService {
-    private ChromeDriverService chromeDriverService;
-    private CropImageService cropImageService;
-    private SanctionInformationRepository sanctionInformationRepository;
-    private final Tesseract tesseract;
+public class ColdPenaltyService {
+    private final ChromeDriverService chromeDriverService;
+    private final CropImageService cropImageService;
+    private final SanctionInformationRepository sanctionInformationRepository;
 
-    public String test(ColdPenaltyReq req) {
+    public String getColdPenalty(ColdPenaltyReq req) {
         String data = this.getResultSearch(req);
         int i = 1;
         do {
@@ -113,7 +104,7 @@ public class TestService {
         this.createSanctionInformation(parse, dataHtml, req.getLicensePlates(), req.getTypeVehicle());
     }
 
-    public Map<Integer, List<String>> resultData(String dataHtml, String licensePlates, String typeVehicle) {
+    public Map<Integer, List<String>> resultData(String dataHtml, ColdPenaltyReq req) {
         String[] data = dataHtml.split("<hr style=\"margin-bottom: 25px;\">");
         Map<Integer, List<String>> parse = new HashMap<>();
         for (int i = 0; i < data.length; i++) {
@@ -122,7 +113,7 @@ public class TestService {
                 parse.put(i, this.analysisHtml(data[i]));
             }
         }
-        this.createSanctionInformation(parse, dataHtml, licensePlates, typeVehicle);
+        this.createSanctionInformation(parse, dataHtml, req.getLicensePlates(), req.getTypeVehicle());
         return parse;
     }
 
@@ -210,20 +201,13 @@ public class TestService {
     }
 
     public String readImage(File fileImage) {
-        //File tmpFolder = LoadLibs.extractTessResources("win32-x86-64");
-        //System.setProperty("java.library.path", tmpFolder.getPath());
-        //Tesseract tesseract = new Tesseract();
         try {
-            //String resource1 = new ClassPathResource("tesseract").getFile().getCanonicalPath();//Constants.RESOURCE_TESSERACT;
-            //log.debug("resource tesseract: " + resource1);
-            //Path dataDirectory = Paths.get(ClassLoader.getSystemResource("tessdata").toURI());
-            //File file = new File(Constants.RESOURCE_TESSERACT);
-            //Path dataDirectory = Paths.get(ClassLoader.getSystemResource("tesseract").toURI());
-            //tesseract.setDatapath(dataDirectory.toString());
-            //tesseract.setDatapath(file.getPath());
-            //tesseract.setLanguage("eng");
-            //tesseract.setPageSegMode(1);
-            //tesseract.setOcrEngineMode(1);
+            Tesseract tesseract = new Tesseract();
+            File file = new File(Constants.RESOURCE_TESSERACT_TEST);
+            tesseract.setDatapath(file.getPath());
+            tesseract.setLanguage("eng");
+            tesseract.setPageSegMode(1);
+            tesseract.setOcrEngineMode(1);
             return tesseract.doOCR(fileImage);
         } catch (TesseractException e) { //| IOException e
             log.debug("OCR Image: " + e.getMessage());
@@ -242,14 +226,14 @@ public class TestService {
             //Copy file at destination
             FileUtils.copyFile(srcFile, destFile);
             BufferedImage bufferedImage = ImageIO.read(srcFile);
-            int x = 25;//40;//this.calculateImage(bufferedImage.getWidth(), 7);
-            int y = 370;//550;//this.calculateImage(bufferedImage.getHeight(), 58);
-            int w = 330;//500;//this.calculateImage(bufferedImage.getWidth(), 55);
-            int h = 70;//110;//this.calculateImage(bufferedImage.getHeight(), 14);
-//            int x = 40;//this.calculateImage(bufferedImage.getWidth(), 7);
-//            int y = 550;//this.calculateImage(bufferedImage.getHeight(), 58);
-//            int w = 500;//this.calculateImage(bufferedImage.getWidth(), 55);
-//            int h = 110;//this.calculateImage(bufferedImage.getHeight(), 14);
+//            int x = 25;//40;//this.calculateImage(bufferedImage.getWidth(), 7);
+//            int y = 370;//550;//this.calculateImage(bufferedImage.getHeight(), 58);
+//            int w = 330;//500;//this.calculateImage(bufferedImage.getWidth(), 55);
+//            int h = 70;//110;//this.calculateImage(bufferedImage.getHeight(), 14);
+            int x = 40;//this.calculateImage(bufferedImage.getWidth(), 7);
+            int y = 550;//this.calculateImage(bufferedImage.getHeight(), 58);
+            int w = 500;//this.calculateImage(bufferedImage.getWidth(), 55);
+            int h = 110;//this.calculateImage(bufferedImage.getHeight(), 14);
             bufferedImage.getHeight();
             BufferedImage subImg = cropImageService.cropImage(bufferedImage, x, y, w, h);
             File pathFile = new File(Constants.RESOURCE_ORIGIN_CUT_SERVER.replace("###", nameImage));

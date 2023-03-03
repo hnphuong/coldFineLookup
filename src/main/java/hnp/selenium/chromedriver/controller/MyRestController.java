@@ -1,12 +1,11 @@
 package hnp.selenium.chromedriver.controller;
 
-import hnp.selenium.chromedriver.constant.Constants;
 import hnp.selenium.chromedriver.dto.AjaxResponseBody;
 import hnp.selenium.chromedriver.dto.LoginForm;
 import hnp.selenium.chromedriver.dto.User;
 import hnp.selenium.chromedriver.dto.request.ColdPenaltyReq;
 import hnp.selenium.chromedriver.dto.response.ColdPenaltyRes;
-import hnp.selenium.chromedriver.service.TestService;
+import hnp.selenium.chromedriver.service.ColdPenaltyService;
 import hnp.selenium.chromedriver.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +26,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class MyRestController {
     private final UserService userService;
-    private final TestService testService;
+    private final ColdPenaltyService coldPenaltyService;
 
     @PostMapping("/api/login")
     public ResponseEntity<AjaxResponseBody> getSearchResultViaAjax(@Valid @RequestBody LoginForm loginForm, Errors errors) {
@@ -55,8 +54,8 @@ public class MyRestController {
             result.setMsg(errors.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(",")));
             return ResponseEntity.badRequest().body(result);
         }
-        String dataResponse = testService.test(request);
-        Map<Integer, List<String>> map = testService.resultData(dataResponse, request.getLicensePlates(), request.getTypeVehicle());//Constants.DATA
+        String dataResponse = coldPenaltyService.getColdPenalty(request);
+        Map<Integer, List<String>> map = coldPenaltyService.resultData(dataResponse, request);//Constants.DATA
         log.debug(request.getLicensePlates() + " # " + request.getTypeVehicle());
         if (map.isEmpty()) {
             result.setMsg("Thất bại");

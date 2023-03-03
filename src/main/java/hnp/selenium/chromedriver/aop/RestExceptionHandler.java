@@ -15,12 +15,13 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolationException;
 import java.nio.file.AccessDeniedException;
 
-@ControllerAdvice
+//@ControllerAdvice
 @RequiredArgsConstructor
 @Slf4j
-@Order(Ordered.LOWEST_PRECEDENCE)
+//@Order(Ordered.HIGHEST_PRECEDENCE)
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     private final MessageUtils messageUtil;
 
@@ -40,6 +41,13 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler({Exception.class})
     public ResponseEntity<BodyResponseDTO<Object>> handleUnCaughtException(HttpServletRequest request, Exception ex) {
+        logger.error(ex.getMessage(), ex);
+        String i18nMessage = messageUtil.populate(ApiResponseCode.UNKNOWN_ERROR.getMessage());
+        return RestResponseWrapper.wrapInternalErrorResponse(i18nMessage);
+    }
+
+    @ExceptionHandler({ConstraintViolationException.class})
+    public ResponseEntity<BodyResponseDTO<Object>> handleConstraintViolation(HttpServletRequest request, Exception ex) {
         logger.error(ex.getMessage(), ex);
         String i18nMessage = messageUtil.populate(ApiResponseCode.UNKNOWN_ERROR.getMessage());
         return RestResponseWrapper.wrapInternalErrorResponse(i18nMessage);
