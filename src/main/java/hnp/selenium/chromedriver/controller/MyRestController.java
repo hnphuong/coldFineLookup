@@ -1,5 +1,6 @@
 package hnp.selenium.chromedriver.controller;
 
+import hnp.selenium.chromedriver.constant.Constants;
 import hnp.selenium.chromedriver.dto.AjaxResponseBody;
 import hnp.selenium.chromedriver.dto.LoginForm;
 import hnp.selenium.chromedriver.dto.User;
@@ -56,6 +57,28 @@ public class MyRestController {
         }
         String dataResponse = coldPenaltyService.getColdPenalty(request);
         Map<Integer, List<String>> map = coldPenaltyService.resultData(dataResponse, request);//Constants.DATA
+        log.debug(request.getLicensePlates() + " # " + request.getTypeVehicle());
+        if (map.isEmpty()) {
+            result.setMsg("Thất bại");
+            result.setStatus(0);
+        } else {
+            result.setMsg("Thành công");
+            result.setStatus(1);
+        }
+        result.setResponse(map);
+        return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/api/test-ajax")
+    public ResponseEntity<ColdPenaltyRes> getTestAjax(@Valid @RequestBody ColdPenaltyReq request, Errors errors) {
+        ColdPenaltyRes result = new ColdPenaltyRes();
+        //If error, just return a 400 bad request, along with the error message
+        if (errors.hasErrors()) {
+            result.setMsg(errors.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(",")));
+            return ResponseEntity.badRequest().body(result);
+        }
+        //String dataResponse = coldPenaltyService.resultData(Constants.DATA, request);
+        Map<Integer, List<String>> map = coldPenaltyService.resultData(Constants.DATA, request);//Constants.DATA
         log.debug(request.getLicensePlates() + " # " + request.getTypeVehicle());
         if (map.isEmpty()) {
             result.setMsg("Thất bại");
