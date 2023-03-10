@@ -3,12 +3,16 @@ package hnp.selenium.chromedriver.service;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import lombok.Getter;
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.PageLoadStrategy;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.devtools.DevTools;
 import org.openqa.selenium.devtools.v109.emulation.Emulation;
+import org.openqa.selenium.remote.CapabilityType;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.Optional;
 
 @Service
@@ -19,7 +23,9 @@ public class ChromeDriverService {
 
     public void setupChromeDriver() {
         WebDriverManager.chromedriver().setup();
-        driver = new ChromeDriver();
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--remote-allow-origins=*");
+        driver = new ChromeDriver(options);
         options();
     }
 

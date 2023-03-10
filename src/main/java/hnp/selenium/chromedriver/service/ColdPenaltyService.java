@@ -40,13 +40,13 @@ public class ColdPenaltyService {
         int i = 1;
         do {
             assert data != null;
-            if (!data.equals(Constants.CAPTCHA_NOT_MATCH)) break;
+            if (!data.contains(Constants.SEARCH_NOT_FOUND) && !data.contains(Constants.CAPTCHA_NOT_MATCH)) break;
             chromeDriverService.close();
             data = this.getResultSearch(req);
             i++;
         } while (i < 3);
         assert data != null;
-        if (!data.isBlank() && !data.equals(Constants.SEARCH_NOT_FOUND) && !data.equals(Constants.CAPTCHA_NOT_MATCH)) {
+        if (!data.isBlank() && !data.contains(Constants.SEARCH_NOT_FOUND) && !data.contains(Constants.CAPTCHA_NOT_MATCH)) {
             this.parseData(data, req);
         } else {
             String uniqueKey = req.getLicensePlates() + "#" + req.getTypeVehicle();
@@ -85,9 +85,10 @@ public class ColdPenaltyService {
             txtCaptcha.sendKeys(this.removeSpecialCharacters(captcha.replace("Z", "7").replace("H", "5").toLowerCase()));
             WebElement search = driver.findElement(By.className("btnTraCuu"));
             search.click();
-            Thread.sleep(2000);
+            Thread.sleep(300);
             WebElement resultCaptcha = driver.findElement(By.className("xe_texterror"));
             if (resultCaptcha.getText().equals(Constants.CAPTCHA_NOT_MATCH)) return Constants.CAPTCHA_NOT_MATCH;
+            Thread.sleep(300);
             WebElement resultSearch = driver.findElement(By.id("bodyPrint123"));
             return resultSearch.getAttribute("innerHTML");
         } catch (InterruptedException ex) {
@@ -102,7 +103,9 @@ public class ColdPenaltyService {
         for (int i = 0; i < data.length; i++) {
             parse.put(i, this.analysisHtml(data[i]));
         }
-        this.createSanctionInformation(parse, dataHtml, req.getLicensePlates(), req.getTypeVehicle());
+        if (!parse.isEmpty()) {
+            this.createSanctionInformation(parse, dataHtml, req.getLicensePlates(), req.getTypeVehicle());
+        }
     }
 
     public Map<Integer, List<String>> resultData(String dataHtml, ColdPenaltyReq req) {
@@ -114,7 +117,9 @@ public class ColdPenaltyService {
                 parse.put(i, this.analysisHtml(data[i]));
             }
         }
-        this.createSanctionInformation(parse, dataHtml, req.getLicensePlates(), req.getTypeVehicle());
+        if (!parse.isEmpty()) {
+            this.createSanctionInformation(parse, dataHtml, req.getLicensePlates(), req.getTypeVehicle());
+        }
         return parse;
     }
 
@@ -203,14 +208,19 @@ public class ColdPenaltyService {
 
     public String readImage(File fileImage) {
         try {
-//            Tesseract tesseract = new Tesseract();
-//            File file = new File(Constants.RESOURCE_TESSERACT_TEST);
-//            tesseract.setDatapath(file.getPath());
-//            tesseract.setLanguage("eng");
-//            tesseract.setPageSegMode(1);
-//            tesseract.setOcrEngineMode(1);
-            return tesseract.doOCR(fileImage);
-        } catch (TesseractException e) { //| IOException e
+            String os = System.getProperty("os.name");
+            if (os.contains("Windows")) {
+                Tesseract tesseractWin = new Tesseract();
+                File file = new File(Constants.RESOURCE_TESSERACT_TEST);
+                tesseractWin.setDatapath(file.getPath());
+                tesseractWin.setLanguage("eng");
+                tesseractWin.setPageSegMode(1);
+                tesseractWin.setOcrEngineMode(1);
+                return tesseractWin.doOCR(fileImage);
+            } else {
+                return tesseract.doOCR(fileImage);
+            }
+        } catch (TesseractException e) {
             log.debug("OCR Image: " + e.getMessage());
             return null;
         }
@@ -227,18 +237,19 @@ public class ColdPenaltyService {
             //Copy file at destination
             FileUtils.copyFile(srcFile, destFile);
             BufferedImage bufferedImage = ImageIO.read(srcFile);
-            int x = 25;
-            int y = 370;
-            int w = 330;
-            int h = 70;
-//            int x = 40;
-//            int y = 550;
-//            int w = 500;
-//            int h = 110;
-//            int x = 40;
-//            int y = 460;
-//            int w = 400;
-//            int h = 90;
+            String os = System.getProperty("os.name");
+            int x, y, w, h;
+            if (os.contains("Windows")) {
+                x = 40;//40;
+                y = 550;//460;
+                w = 500;//400;
+                h = 110;//90;
+            } else {
+                x = 25;
+                y = 370;
+                w = 330;
+                h = 70;
+            }
             bufferedImage.getHeight();
             BufferedImage subImg = cropImageService.cropImage(bufferedImage, x, y, w, h);
             File pathFile = new File(Constants.RESOURCE_ORIGIN_CUT_SERVER.replace("###", nameImage));

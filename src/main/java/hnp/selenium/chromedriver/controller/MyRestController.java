@@ -77,9 +77,8 @@ public class MyRestController {
             result.setMsg(errors.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(",")));
             return ResponseEntity.badRequest().body(result);
         }
-        //String dataResponse = coldPenaltyService.resultData(Constants.DATA, request);
+        //String dataResponse = coldPenaltyService.getColdPenalty(request);
         Map<Integer, List<String>> map = coldPenaltyService.resultData(Constants.DATA, request);//Constants.DATA
-        log.debug(request.getLicensePlates() + " # " + request.getTypeVehicle());
         if (map.isEmpty()) {
             result.setMsg("Thất bại");
             result.setStatus(0);
