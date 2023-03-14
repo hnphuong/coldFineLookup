@@ -11,6 +11,7 @@
     <link rel="stylesheet" th:href="@{/css/bootstrap.css}" type="text/css"/>
     <link rel="stylesheet" th:href="@{/css/font-awesome.css}" type="text/css"/>
     <link rel="stylesheet" th:href="@{/css/main.css}" type="text/css"/>
+    <script th:src="@{/js/jquery.min.js}"></script>
 </head>
 
 <body class="bg-light">
@@ -69,20 +70,20 @@
                 <div class="row g-3">
                     <div class="col-md-5">
                         <label for="license-plates" class="form-label">Biển số xe</label>
-                        <input type="text" class="form-control" id="license-plates" placeholder="29A12345" required>
-                        <div class="invalid-feedback">
-                            Biển số xe is required.
+                        <input type="text" class="form-control" id="license-plates" placeholder="29A12345">
+                        <div class="invalid-feedback" id="license-plates-check">
+                            Biển số xe không được để trống.
                         </div>
                     </div>
                     <div class="col-md-4">
                         <label for="type-vehicle" class="form-label">Loại phương tiện</label>
-                        <select class="form-select" id="type-vehicle" required>
+                        <select class="form-select" id="type-vehicle">
                             <option value="1">Ô tô</option>
                             <option value="2">Xe máy</option>
                             <option value="3">Xe đạp</option>
                         </select>
                         <div class="invalid-feedback">
-                            Phương tiện is required.
+                            Phương tiện không được để trống.
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -96,8 +97,8 @@
         </div>
         <hr class="my-4">
         <div class="container">
-            <div class="row" id="feedback-response-search">
-                <div class="col-12 d-flex justify-content-center d-none" id="loading">
+            <div class="row d-none" id="loading">
+                <div class="col-12 d-flex justify-content-center">
                     <div class="spinner-grow text-primary" role="status">
                         <span class="visually-hidden">Loading...</span>
                     </div>
@@ -124,6 +125,8 @@
                     </div>
                 </div>
             </div>
+            <div class="row d-none" id="feedback-response-search">
+            </div>
             <div class="row" id="feedback"></div>
         </div>
     </main>
@@ -137,9 +140,7 @@
     </footer>
 </div>
 <script th:src="@{/js/bootstrap.bundle.js}"></script>
-<script th:src="@{/js/checkout.js}"></script>
-<script th:src="@{/js/jquery.min.js}"></script>
-<script th:src="@{/js/ajax_search_cold_penalty.js}"></script>
+<script th:src="@{/js/ajax_functions.js}"></script>
 </body>
 
 </html>
