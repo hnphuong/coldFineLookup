@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta name="description" content="content"/>
+    <meta name="author" content="author"/>
+    <meta name="generator" content="generator"/>
+    <title>Tra cứu phạt nguội</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.css}" type="text/css"/>
+    <link rel="stylesheet" th:href="@{/css/font-awesome.css}" type="text/css"/>
+    <link rel="stylesheet" th:href="@{/css/main.css}" type="text/css"/>
+    <script th:src="@{/js/jquery.min.js}"></script>
+</head>
+
+<body class="bg-light">
+<div class="container bg-light-subtle">
+    <main>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-success text-white" aria-label="navbar large">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">Tra cứu phạt nguội</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas"
+                        data-bs-target="#offcanvasNavbar2" aria-controls="offcanvasNavbar2">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="offcanvas offcanvas-end text-bg-dark" tabindex="-1" id="offcanvasNavbar2"
+                     aria-labelledby="offcanvasNavbar2Label">
+                    <div class="offcanvas-header">
+                        <h5 class="offcanvas-title" id="offcanvasNavbar2Label">Menu</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="offcanvas-body">
+                        <!--                        <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">-->
+                        <!--                            <li class="nav-item">-->
+                        <!--                                <a class="nav-link active" aria-current="page" href="/">Tra cứu phạt nguội</a>-->
+                        <!--                            </li>-->
+                        <!--                            <li class="nav-item">-->
+                        <!--                                <a class="nav-link" href="#">Link</a>-->
+                        <!--                            </li>-->
+                        <!--                            <li class="nav-item dropdown">-->
+                        <!--                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"-->
+                        <!--                                   aria-expanded="false">-->
+                        <!--                                    Dropdown-->
+                        <!--                                </a>-->
+                        <!--                                <ul class="dropdown-menu">-->
+                        <!--                                    <li><a class="dropdown-item" href="#">Action</a></li>-->
+                        <!--                                    <li><a class="dropdown-item" href="#">Another action</a></li>-->
+                        <!--                                    <li>-->
+                        <!--                                        <hr class="dropdown-divider">-->
+                        <!--                                    </li>-->
+                        <!--                                    <li><a class="dropdown-item" href="#">Something else here</a></li>-->
+                        <!--                                </ul>-->
+                        <!--                            </li>-->
+                        <!--                        </ul>-->
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <!-- end menu -->
+        <div class="py-3 text-center">
+            <img class="d-block mx-auto mb-4" th:src="@{/assets/logo/main.png}" alt="logo"/>
+            <h2>Tra cứu phạt nguội ngay!</h2>
+<!--            <h1>Test &ndash;&gt; </h1>-->
+            <!--            <p class="lead">Below is an example form built entirely with Bootstrap’s form controls.</p>-->
+        </div>
+        <div class="row g-5">
+            <form class="needs-validation" novalidate action="#" id="search-cold-penalty">
+                <div class="row g-3">
+                    <div class="col-md-5">
+                        <label for="license-plates" class="form-label">Biển số xe</label>
+                        <input type="text" class="form-control" id="license-plates" placeholder="29A12345">
+                        <div class="invalid-feedback" id="license-plates-check">
+                            Biển số xe không được để trống.
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="type-vehicle" class="form-label">Loại phương tiện</label>
+                        <select class="form-select" id="type-vehicle">
+                            <option value="1">Ô tô</option>
+                            <option value="2">Xe máy</option>
+                            <option value="3">Xe đạp</option>
+                        </select>
+                        <div class="invalid-feedback">
+                            Phương tiện không được để trống.
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Tìm kiếm</label>
+                        <div class="text-center">
+                            <button class="btn btn-primary" type="submit" id="btn-search">Tìm kiếm</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <hr class="my-4">
+        <div class="container">
+            <div class="row d-none" id="loading">
+                <div class="col-12 d-flex justify-content-center">
+                    <div class="spinner-grow text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <div class="spinner-grow text-secondary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <div class="spinner-grow text-success" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <div class="spinner-grow text-danger" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <div class="spinner-grow text-warning" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <div class="spinner-grow text-info" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <div class="spinner-grow text-light" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <div class="spinner-grow text-dark" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+            <div class="row d-none" id="feedback-response-search">
+            </div>
+            <div class="row" id="feedback"></div>
+        </div>
+    </main>
+    <footer class="my-5 pt-5 text-muted text-center text-small">
+        <p class="mb-1">&copy; 2020–2023 Company Name</p>
+        <ul class="list-inline">
+            <li class="list-inline-item"><a href="#">Privacy</a></li>
+            <li class="list-inline-item"><a href="#">Terms</a></li>
+            <li class="list-inline-item"><a href="#">Support</a></li>
+        </ul>
+    </footer>
+</div>
+<script th:src="@{/js/bootstrap.bundle.js}"></script>
+<script th:src="@{/js/ajax_functions.js}"></script>
+</body>
+
+</html>

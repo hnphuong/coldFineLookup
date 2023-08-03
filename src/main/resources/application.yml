@@ -38,3 +38,8 @@ spring:
     # suffix: .html
     # template-resolver-order:
     # view-names:
+endpoint:
+  timeout: 30000
+  chatGpt:
+    baseUrl: https://api.openai.com
+    completions: /v1/chat/completions

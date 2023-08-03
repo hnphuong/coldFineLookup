@@ -5,7 +5,11 @@ import hnp.selenium.chromedriver.dto.AjaxResponseBody;
 import hnp.selenium.chromedriver.dto.LoginForm;
 import hnp.selenium.chromedriver.dto.User;
 import hnp.selenium.chromedriver.dto.request.ColdPenaltyReq;
+import hnp.selenium.chromedriver.dto.request.QuestionChatGPTRequest;
+import hnp.selenium.chromedriver.dto.response.ChatGPTResponse;
 import hnp.selenium.chromedriver.dto.response.ColdPenaltyRes;
+import hnp.selenium.chromedriver.dto.response.chatGPT.Message;
+import hnp.selenium.chromedriver.service.ChatGptService;
 import hnp.selenium.chromedriver.service.ColdPenaltyService;
 import hnp.selenium.chromedriver.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -13,9 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -28,6 +30,7 @@ import java.util.stream.Collectors;
 public class MyRestController {
     private final UserService userService;
     private final ColdPenaltyService coldPenaltyService;
+    private final ChatGptService chatGptService;
 
     @PostMapping("/api/login")
     public ResponseEntity<AjaxResponseBody> getSearchResultViaAjax(@Valid @RequestBody LoginForm loginForm, Errors errors) {
@@ -87,6 +90,18 @@ public class MyRestController {
             result.setStatus(1);
         }
         result.setResponse(map);
+        return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/api/chat-gpt")
+    public ResponseEntity<ChatGPTResponse> chatGpt(@Valid @RequestBody QuestionChatGPTRequest request) {
+        ChatGPTResponse result = chatGptService.chatGPT(request);
+        return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/api/chat-completions")
+    public ResponseEntity<Message> messageChatGpt(@Valid @RequestBody QuestionChatGPTRequest request) {
+        Message result = chatGptService.messageChatGPT(request);
         return ResponseEntity.ok(result);
     }
 }

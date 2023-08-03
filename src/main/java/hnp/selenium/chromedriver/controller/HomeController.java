@@ -19,4 +19,13 @@ public class HomeController {
         String os = System.getProperty("os.name");
         return ResponseEntity.ok(os);
     }
+    @GetMapping("/search")
+    public String searchPage() {
+        return "search";
+    }
+
+    @GetMapping("/chat-gpt")
+    public String chatGPTPage() {
+        return "index";
+    }
 }
